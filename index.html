@@ -3,101 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GrootSecure — Hardened Linux Mint</title>
-<meta name="description" content="GrootSecure 22.2: a complete, working Linux Mint Cinnamon desktop with serious security hardening baked in.">
+<title>GrootSecure — Try It Online</title>
 <style>
-  :root{
-    --bg:#0b0f14; --panel:#11161d; --line:#1e2632;
-    --txt:#e8edf4; --mut:#9aa6b8; --acc:#4ade80; --acc2:#22d3ee;
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.6}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
-  header{padding:28px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-  .logo{font-size:22px;font-weight:800;letter-spacing:.5px}
-  .logo span{color:var(--acc)}
-  nav a{color:var(--mut);text-decoration:none;margin-left:22px;font-size:14px}
-  nav a:hover{color:var(--txt)}
-  .hero{padding:90px 0 70px;text-align:center}
-  .hero h1{font-size:clamp(38px,6vw,64px);font-weight:800;line-height:1.1;margin-bottom:18px}
-  .hero h1 span{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .hero p{color:var(--mut);font-size:18px;max-width:640px;margin:0 auto 34px}
-  .btn{display:inline-block;padding:14px 32px;border-radius:10px;font-weight:700;text-decoration:none;font-size:16px;margin:6px}
-  .btn-go{background:var(--acc);color:#06210f}
-  .btn-go:hover{filter:brightness(1.1)}
-  .btn-ghost{border:1px solid var(--line);color:var(--txt)}
-  .btn-ghost:hover{border-color:var(--acc)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;padding:20px 0 70px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px}
-  .card h3{font-size:17px;margin-bottom:10px;color:var(--acc)}
-  .card p{color:var(--mut);font-size:14.5px}
-  .card code{color:var(--acc2);font-size:13px}
-  h2.sec{font-size:30px;margin:10px 0 8px;text-align:center}
-  p.sub{color:var(--mut);text-align:center;margin-bottom:30px}
-  .steps{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:30px;margin-bottom:70px}
-  .steps ol{margin-left:20px;color:var(--mut)}
-  .steps li{margin-bottom:12px}
-  .steps code{background:#0b0f14;padding:2px 8px;border-radius:6px;color:var(--acc2);font-size:13.5px}
-  .steps pre{background:#0b0f14;border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto;margin:12px 0;color:var(--txt);font-size:13.5px}
-  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--mut);font-size:13.5px;text-align:center}
-  footer a{color:var(--acc);text-decoration:none}
-  .badge{display:inline-block;font-size:12px;border:1px solid var(--acc);color:var(--acc);border-radius:20px;padding:4px 14px;margin-bottom:18px;letter-spacing:1px}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0b0f14;color:#e8edf4;user-select:none}
+  /* ---------- BOOT ---------- */
+  #boot{position:fixed;inset:0;background:#0b0f14;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;transition:opacity .6s}
+  #boot.hide{opacity:0;pointer-events:none}
+  .blogo{font-size:64px;margin-bottom:10px}
+  .bname{font-size:30px;font-weight:800;margin-bottom:6px}
+  .bname span{color:#4ade80}
+  .bsub{color:#9aa6b8;font-size:14px;margin-bottom:34px}
+  .bbar{width:280px;height:4px;background:#1e2632;border-radius:2px;overflow:hidden}
+  .bbar i{display:block;height:100%;width:0;background:#4ade80;border-radius:2px;transition:width .3s}
+  .bmsg{margin-top:14px;color:#5b6678;font-size:12.5px;font-family:monospace;min-height:18px}
+  /* ---------- LOGIN ---------- */
+  #login{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(135deg,#0d1420 0%,#101a12 100%)}
+  #login.show{display:flex}
+  .lavatar{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px;box-shadow:0 0 60px rgba(74,222,128,.25)}
+  .lname{font-size:22px;font-weight:700;margin-bottom:4px}
+  .lsub{color:#9aa6b8;font-size:13px;margin-bottom:26px}
+  .lbtn{background:#4ade80;color:#06210f;border:none;padding:13px 52px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer}
+  .lbtn:hover{filter:brightness(1.08)}
+  .lhint{margin-top:18px;color:#5b6678;font-size:12px}
+  /* ---------- DESKTOP ---------- */
+  #desk{position:fixed;inset:0;display:none;background:radial-gradient(1200px 700px at 70% 20%,#12241a 0%,#0b0f14 60%)}
+  #desk.show{display:block}
+  .demo-tag{position:fixed;top:10px;right:12px;z-index:60;font-size:11px;color:#0b0f14;background:#fbbf24;border-radius:20px;padding:4px 12px;font-weight:700;letter-spacing:.5px}
+  /* icons */
+  #icons{position:absolute;top:24px;left:22px;display:flex;flex-direction:column;gap:22px}
+  .dicon{width:88px;text-align:center;cursor:pointer;padding:8px 4px;border-radius:10px}
+  .dicon:hover{background:rgba(255,255,255,.07)}
+  .dicon .e{font-size:40px}
+  .dicon .t{font-size:12px;margin-top:4px;color:#dfe6f0;text-shadow:0 1px 3px #000}
+  /* panel */
+  #panel{position:absolute;left:0;right:0;bottom:0;height:46px;background:rgba(13,18,26,.96);border-top:1px solid #1e2632;display:flex;align-items:center;padding:0 10px;z-index:50}
+  #menuBtn{font-size:22px;cursor:pointer;padding:6px 12px;border-radius:8px}
+  #menuBtn:hover{background:rgba(255,255,255,.08)}
+  #tasks{display:flex;gap:6px;margin-left:10px;flex:1;overflow:hidden}
+  .task{background:#1a2230;border:1px solid #2a3444;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+  .task.active{border-color:#4ade80}
+  #clock{font-size:13px;color:#9aa6b8;padding:0 8px;font-variant-numeric:tabular-nums}
+  /* start menu */
+  #smenu{position:absolute;left:8px;bottom:54px;width:300px;background:rgba(17,22,29,.98);border:1px solid #2a3444;border-radius:14px;padding:12px;display:none;z-index:55;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+  #smenu.show{display:block}
+  .mitem{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:14.5px}
+  .mitem:hover{background:rgba(74,222,128,.12)}
+  .mitem .e{font-size:22px}
+  .mhead{padding:8px 12px 12px;color:#9aa6b8;font-size:12px;letter-spacing:1px}
+  /* windows */
+  .win{position:absolute;background:#11161d;border:1px solid #2a3444;border-radius:12px;box-shadow:0 18px 60px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;min-width:280px;min-height:180px}
+  .wtitle{background:#161d27;padding:9px 12px;display:flex;align-items:center;gap:10px;cursor:move;font-size:13.5px;font-weight:600;border-bottom:1px solid #1e2632}
+  .wtitle .dot{width:11px;height:11px;border-radius:50%;cursor:pointer}
+  .wbody{flex:1;overflow:auto;position:relative}
+  /* terminal */
+  .term{background:#05070a;color:#c9f5d6;font-family:'Cascadia Code','JetBrains Mono',Consolas,monospace;font-size:13.5px;padding:12px;height:100%;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+  .term .in{color:#4ade80}
+  .term input{background:transparent;border:none;outline:none;color:#e8edf4;font:inherit;width:60%}
+  /* text window */
+  .txtwin{padding:18px;font-size:14px;line-height:1.65;color:#c7cddb;white-space:pre-wrap;font-family:Consolas,monospace}
+  .txtwin h3{color:#4ade80;font-family:'Segoe UI',sans-serif;margin-bottom:10px}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#2a3444;border-radius:5px}
+  @media (max-width:640px){ .dicon{width:70px} .dicon .e{font-size:32px} }
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">
-    <div class="logo">🌳 Groot<span>Secure</span></div>
-    <nav>
-      <a href="#features">Features</a>
-      <a href="#download">Download</a>
-      <a href="https://github.com/sunnymishraatf-lgtm/GrootSecure">GitHub</a>
-    </nav>
+
+<!-- BOOT -->
+<div id="boot">
+  <div class="blogo">🌳</div>
+  <div class="bname">Groot<span>Secure</span></div>
+  <div class="bsub">INTERACTIVE ONLINE DEMO</div>
+  <div class="bbar"><i id="bbarFill"></i></div>
+  <div class="bmsg" id="bmsg"></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lavatar">🌳</div>
+  <div class="lname">groot</div>
+  <div class="lsub">GrootSecure 22.2 · demo session</div>
+  <button class="lbtn" id="loginBtn">Log In →</button>
+  <div class="lhint">No password needed for this demo</div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desk">
+  <div class="demo-tag">ONLINE DEMO</div>
+  <div id="icons">
+    <div class="dicon" data-app="term"><div class="e">💻</div><div class="t">Terminal</div></div>
+    <div class="dicon" data-app="files"><div class="e">📁</div><div class="t">Files</div></div>
+    <div class="dicon" data-app="about"><div class="e">🌳</div><div class="t">About</div></div>
+    <div class="dicon" data-app="sec"><div class="e">🛡️</div><div class="t">Security</div></div>
   </div>
-</header>
-
-<div class="wrap">
-  <section class="hero">
-    <div class="badge">BASED ON LINUX MINT 22.2 "ZARA"</div>
-    <h1>A complete Linux desktop.<br><span>Hardened by default.</span></h1>
-    <p>GrootSecure is Linux Mint 22.2 Cinnamon with serious security hardening baked in — firewall on, kernel locked down, updates automatic. Nothing removed, protection added.</p>
-    <a class="btn btn-go" href="https://github.com/sunnymishraatf-lgtm/GrootSecure/releases/tag/v1.0">⬇ Download v1.0</a>
-    <a class="btn btn-ghost" href="#features">See what's inside</a>
-  </section>
-
-  <h2 class="sec" id="features">Security, out of the box</h2>
-  <p class="sub">Every layer hardened at build time — verified in the final image.</p>
-  <div class="grid">
-    <div class="card"><h3>🛡️ Firewall on</h3><p><code>ufw</code> enabled at boot: deny all incoming, allow outgoing. Graphical manager <code>gufw</code> included.</p></div>
-    <div class="card"><h3>🔒 Kernel locked down</h3><p>Hidden kernel pointers (<code>kptr_restrict=2</code>), unprivileged eBPF disabled, restricted perf &amp; ptrace, no setuid core dumps.</p></div>
-    <div class="card"><h3>🌐 Network hardened</h3><p>SYN cookies, reverse-path filtering, no ICMP redirects or source routing, broadcast ping ignored, martians logged.</p></div>
-    <div class="card"><h3>⛓️ AppArmor enforced</h3><p>Mandatory access control active with shipped profiles in enforce mode.</p></div>
-    <div class="card"><h3>🔄 Auto security updates</h3><p><code>unattended-upgrades</code> installed — security patches download and apply daily, silently.</p></div>
-    <div class="card"><h3>🚫 No SSH server</h3><p>No OpenSSH server ships — zero remote-login attack surface out of the box.</p></div>
-    <div class="card"><h3>👤 Login hardened</h3><p>LightDM guest sessions disabled. Strong password quality rules via <code>libpam-pwquality</code>.</p></div>
-    <div class="card"><h3>📄 Auditable</h3><p>Full hardening notes ship at <code>/etc/grootos-secure/HARDENING.md</code> on every system.</p></div>
+  <div id="smenu">
+    <div class="mhead">APPLICATIONS</div>
+    <div class="mitem" data-app="term"><span class="e">💻</span>Terminal</div>
+    <div class="mitem" data-app="files"><span class="e">📁</span>Files</div>
+    <div class="mitem" data-app="about"><span class="e">🌳</span>About GrootSecure</div>
+    <div class="mitem" data-app="sec"><span class="e">🛡️</span>Security Center</div>
+    <div class="mitem" data-app="dl"><span class="e">⬇️</span>Get the real ISO</div>
   </div>
-
-  <h2 class="sec" id="download">Get GrootSecure</h2>
-  <p class="sub">3.3 GB ISO, split into 4 parts for easy download.</p>
-  <div class="steps">
-    <ol>
-      <li>Download all 4 parts from the <a href="https://github.com/sunnymishraatf-lgtm/GrootSecure/releases/tag/v1.0" style="color:var(--acc)">v1.0 release page</a>.</li>
-      <li>Join them into the ISO:
-        <pre>cat gs-part-* &gt; GrootSecure-22.2-cinnamon-64bit.iso</pre>
-        <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Windows CMD: <code>copy /b gs-part-aa+gs-part-ab+gs-part-ac+gs-part-ad GrootSecure-22.2-cinnamon-64bit.iso</code></div>
-      </li>
-      <li>Verify integrity:
-        <pre>sha256sum -c GrootSecure-22.2-cinnamon-64bit.iso.sha256</pre>
-      </li>
-      <li>Write to USB with <b>Rufus</b> / <b>balenaEtcher</b>, or boot it in <b>VirtualBox</b> (4 GB RAM, 25 GB disk).</li>
-      <li>On install, tick <b>"Encrypt the new installation"</b> for full-disk encryption.</li>
-    </ol>
+  <div id="panel">
+    <div id="menuBtn">🌳</div>
+    <div id="tasks"></div>
+    <div id="clock"></div>
   </div>
 </div>
 
-<footer>
-  Built with care by <a href="https://github.com/sunnymishraatf-lgtm">Sunny Mishra</a> · Based on Linux Mint 22.2 "Zara" · <a href="https://github.com/sunnymishraatf-lgtm/GrootSecure">Source on GitHub</a>
-</footer>
+<script>
+/* ================= VIRTUAL FILESYSTEM (mirrors real GrootSecure layout) ================= */
+const FS = {
+  '/etc/grootos-secure/HARDENING.md': null, // filled below
+  '/etc/sysctl.d/99-grootos-secure.conf': null,
+  '/etc/ufw/ufw.conf': 'ENABLED=yes\n',
+  '/home/groot/README.txt': 'Welcome to GrootSecure (online demo).\nOpen Terminal and type "help" to explore.\n',
+};
+FS['/etc/grootos-secure/HARDENING.md'] = `# GrootSecure 22.2 — security hardening
+## Firewall
+- ufw installed, enabled, default-DENY incoming / default-ALLOW outgoing.
+- gufw (graphical firewall manager) installed.
+## Kernel hardening (/etc/sysctl.d/99-grootos-secure.conf)
+- kptr_restrict=2, dmesg_restrict=1, perf_event_paranoid=3
+- unprivileged_bpf_disabled=2, yama.ptrace_scope=1
+- fs.suid_dumpable=0, vm.mmap_min_addr=65536
+## Network hardening
+- rp_filter=1, tcp_syncookies=1, no redirects/source-routing
+- icmp_echo_ignore_broadcasts=1, log_martians=1
+## Extras
+- AppArmor enforced, unattended-upgrades daily,
+  no openssh-server, no guest sessions, libpam-pwquality.`;
+FS['/etc/sysctl.d/99-grootos-secure.conf'] =
+`kernel.kptr_restrict = 2
+kernel.dmesg_restrict = 1
+kernel.perf_event_paranoid = 3
+kernel.unprivileged_bpf_disabled = 2
+kernel.yama.ptrace_scope = 1
+fs.suid_dumpable = 0
+vm.mmap_min_addr = 65536
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.icmp_echo_ignore_broadcasts = 1`;
+
+/* ================= SHELL ================= */
+let cwd = '/home/groot';
+function resolve(p){
+  if(p.startsWith('/')) return norm(p);
+  return norm(cwd + '/' + p);
+}
+function norm(p){
+  const parts = p.split('/').filter(Boolean), out = [];
+  for(const x of parts){ if(x==='.') continue; if(x==='..') out.pop(); else out.push(x); }
+  return '/' + out.join('/');
+}
+function listDir(d){
+  const seen = new Set(), dirs = new Set();
+  for(const k of Object.keys(FS)){
+    if(k === d) continue;
+    if(k.startsWith(d === '/' ? '/' : d + '/')){
+      const rest = k.slice(d === '/' ? 1 : d.length + 1).split('/');
+      if(rest.length === 1) seen.add(rest[0]);
+      else dirs.add(rest[0]);
+    }
+  }
+  return {files:[...seen].sort(), dirs:[...dirs].sort()};
+}
+const CMDS = {
+  help(){ return `GrootSecure demo shell — try:
+  ls, cd, pwd, cat <file>, echo <text>, whoami, uname,
+  uptime, date, clear, ufw, sysctl, secure, about, exit
+Files to read: /etc/grootos-secure/HARDENING.md`; },
+  ls(a){ const t=resolve(a[0]||'.'); const {files,dirs}=listDir(t);
+    if(!files.length&&!dirs.length) return `ls: cannot access '${a[0]||'.'}': No such file or directory`;
+    return dirs.map(d=>'\x1b[34m'+d+'/\x1b[0m').concat(files).join('  ')||''; },
+  cd(a){ if(!a[0]||a[0]==='~'){cwd='/home/groot';return '';} const t=resolve(a[0]);
+    const {files,dirs}=listDir(t);
+    if(files.length||dirs.length||t==='/home/groot'){cwd=t;return '';}
+    return `bash: cd: ${a[0]}: No such file or directory`; },
+  pwd(){ return cwd; },
+  cat(a){ if(!a[0]) return 'usage: cat <file>'; const t=resolve(a[0]);
+    if(FS[t]!==undefined&&FS[t]!==null) return FS[t];
+    const {dirs}=listDir(t); if(dirs.length||listDir(t).files.length) return `cat: ${a[0]}: Is a directory`;
+    return `cat: ${a[0]}: No such file or directory`; },
+  echo(a){ return a.join(' '); },
+  whoami(){ return 'groot'; },
+  uname(a){ return a.includes('-a') ? 'Linux grootsecure 6.8.0-52-generic #53-Ubuntu SMP x86_64 GNU/Linux' : 'Linux'; },
+  uptime(){ return ' 00:42:17 up 42 min,  1 user,  load average: 0.07, 0.03, 0.01'; },
+  date(){ return new Date().toString(); },
+  clear(){ termClear(); return null; },
+  ufw(){ return `Status: active\nDefault: deny (incoming), allow (outgoing)`; },
+  sysctl(a){ const k=a[0]; const conf=FS['/etc/sysctl.d/99-grootos-secure.conf'];
+    if(!k) return conf;
+    const line=conf.split('\n').find(l=>l.startsWith(k));
+    return line || `sysctl: cannot stat /proc/sys/${k.replace(/\./g,'/')}: No such file or directory`; },
+  secure(){ return `GrootSecure hardening: ACTIVE
+  [✓] ufw firewall enabled (deny incoming)
+  [✓] kernel hardening via /etc/sysctl.d/99-grootos-secure.conf
+  [✓] AppArmor enforcing
+  [✓] unattended-upgrades: daily security updates
+  [✓] openssh-server: not installed
+  [✓] guest sessions: disabled`; },
+  about(){ return `GrootSecure 22.2 "Zara" — hardened Linux Mint Cinnamon.
+Built by Sunny Mishra. This is an interactive online demo;
+the full 3.3 GB ISO is on GitHub.`; },
+  sudo(){ return `[sudo] password for groot: \nSorry, demo mode — no real root here :)`; },
+  apt(){ return `Demo mode: packages can't be installed here.\nOn the real ISO, unattended-upgrades handles security updates.`; },
+  exit(){ return 'Demo terminal — type "clear" to tidy up.'; },
+};
+function runCmd(line){
+  const parts = line.trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return '';
+  const c = parts[0], args = parts.slice(1);
+  if(CMDS[c]){ const r = CMDS[c](args); return r === null ? null : String(r); }
+  return `bash: ${c}: command not found — type "help"`;
+}
+
+/* ================= WINDOW MANAGER ================= */
+let zTop = 10, winCount = 0;
+const tasksEl = document.getElementById('tasks');
+function openApp(app){
+  closeMenu();
+  const id = 'w' + (++winCount);
+  const titles = {term:'💻 Terminal — groot@grootsecure', files:'📁 Files', about:'🌳 About GrootSecure', sec:'🛡️ Security Center', dl:'⬇️ Get the real ISO'};
+  const win = document.createElement('div');
+  win.className = 'win'; win.id = id;
+  const w = Math.min(560, innerWidth - 24), h = Math.min(400, innerHeight - 120);
+  win.style.cssText = `width:${w}px;height:${h}px;left:${Math.max(8,(innerWidth-w)/2 + (winCount%3)*24 - 24)}px;top:${Math.max(8,(innerHeight-h)/2 - 40 + (winCount%3)*20)}px;z-index:${++zTop}`;
+  win.innerHTML = `<div class="wtitle"><span class="dot" style="background:#ff5f57" data-x></span><span class="dot" style="background:#febc2e" data-m></span><span style="flex:1">${titles[app]||app}</span></div><div class="wbody"></div>`;
+  document.getElementById('desk').appendChild(win);
+  const body = win.querySelector('.wbody');
+  if(app==='term') buildTerm(body);
+  else if(app==='files') buildFiles(body);
+  else if(app==='about') body.innerHTML = `<div class="txtwin"><h3>🌳 GrootSecure 22.2</h3>Hardened Linux Mint 22.2 "Zara" (Cinnamon).\n\nBuilt from the official Mint ISO (SHA256-verified) with security hardening baked in: ufw firewall, kernel lockdown, AppArmor, automatic security updates, no SSH server, no guest logins.\n\n<b style="color:#e8edf4">This page is an interactive online demo.</b> The full 3.3 GB bootable ISO lives on GitHub — grab it from "Get the real ISO" to run it in VirtualBox or on real hardware.\n\n— Built by Sunny Mishra</div>`;
+  else if(app==='sec') body.innerHTML = `<div class="txtwin"><h3>🛡️ Security Center</h3>${CMDS.secure().replace(/\n/g,'<br>')}<br><br>Type <b>secure</b> in the Terminal any time.</div>`;
+  else if(app==='dl') body.innerHTML = `<div class="txtwin"><h3>⬇️ Get the real ISO</h3>Full bootable ISO (3.3 GB) on GitHub:\n\n<a href="https://github.com/sunnymishraatf-lgtm/GrootSecure/releases/tag/v1.0" target="_blank" style="color:#4ade80">github.com/sunnymishraatf-lgtm/GrootSecure/releases</a>\n\nJoin the 4 parts, verify the SHA256, then boot in VirtualBox (4 GB RAM) or write to USB with Rufus.</div>`;
+  // taskbar
+  const t = document.createElement('div');
+  t.className = 'task active'; t.textContent = titles[app]||app; t.dataset.win = id;
+  tasksEl.querySelectorAll('.task').forEach(x=>x.classList.remove('active'));
+  tasksEl.appendChild(t);
+  t.onclick = ()=>{ win.style.display = win.style.display==='none'?'flex':'none'; };
+  win.querySelector('[data-x]').onclick = ()=>{ win.remove(); t.remove(); };
+  win.querySelector('[data-m]').onclick = ()=>{ win.style.display='none'; };
+  win.addEventListener('mousedown', ()=>{ win.style.zIndex = ++zTop; tasksEl.querySelectorAll('.task').forEach(x=>x.classList.remove('active')); t.classList.add('active'); });
+  dragWin(win);
+  return win;
+}
+function dragWin(win){
+  const bar = win.querySelector('.wtitle');
+  let sx, sy, ox, oy, drag=false;
+  bar.addEventListener('pointerdown', e=>{ if(e.target.dataset.x!==undefined||e.target.dataset.m!==undefined) return; drag=true; sx=e.clientX; sy=e.clientY; ox=win.offsetLeft; oy=win.offsetTop; bar.setPointerCapture(e.pointerId); });
+  bar.addEventListener('pointermove', e=>{ if(!drag) return; win.style.left = Math.max(0, ox + e.clientX - sx) + 'px'; win.style.top = Math.max(0, oy + e.clientY - sy) + 'px'; });
+  bar.addEventListener('pointerup', ()=> drag=false);
+}
+/* terminal */
+let termEl, termClear;
+function buildTerm(body){
+  body.innerHTML = `<div class="term" id="termBox"></div>`;
+  termEl = body.querySelector('#termBox');
+  const print = html => { termEl.innerHTML += html + '\n'; termEl.scrollTop = termEl.scrollHeight; };
+  termClear = ()=> termEl.innerHTML = '';
+  print(`<span class="in">groot@grootsecure</span>:<span style="color:#22d3ee">~</span>$ welcome to the GrootSecure demo — type <b>help</b>`);
+  newPrompt();
+  function newPrompt(){
+    const line = document.createElement('div');
+    line.innerHTML = `<span class="in">groot@grootsecure</span>:<span style="color:#22d3ee">${cwd.replace('/home/groot','~')}</span>$ <input autocomplete="off" spellcheck="false">`;
+    termEl.appendChild(line);
+    const inp = line.querySelector('input');
+    inp.focus();
+    inp.addEventListener('keydown', e=>{
+      if(e.key === 'Enter'){
+        const v = inp.value; inp.replaceWith(document.createTextNode(v));
+        const out = runCmd(v);
+        if(out !== null && out !== '') print(escapeHtml(out));
+        else if(out === '') {}
+        newPrompt();
+        termEl.scrollTop = termEl.scrollHeight;
+      }
+      e.stopPropagation();
+    });
+    termEl.onclick = ()=> inp.focus();
+  }
+}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+/* files */
+function buildFiles(body){
+  let path = '/home/groot';
+  const render = ()=>{
+    const {files, dirs} = listDir(path);
+    body.innerHTML = `<div style="padding:14px">
+      <div style="color:#9aa6b8;font-size:13px;margin-bottom:12px">📍 ${path}</div>
+      ${dirs.map(d=>`<div class="mitem" data-d="${d}"><span class="e">📁</span>${d}/</div>`).join('')}
+      ${files.map(f=>`<div class="mitem" data-f="${f}"><span class="e">📄</span>${f}</div>`).join('')}
+      ${!dirs.length && !files.length ? '<div style="color:#5b6678">Empty folder</div>' : ''}
+    </div>`;
+    body.querySelectorAll('[data-d]').forEach(el=> el.onclick = ()=>{ path = norm(path + '/' + el.dataset.d); render(); });
+    body.querySelectorAll('[data-f]').forEach(el=> el.onclick = ()=>{
+      const p = norm(path + '/' + el.dataset.f);
+      const w = openApp('about'); w.querySelector('.wbody').innerHTML = `<div class="txtwin"><h3>📄 ${el.dataset.f}</h3>${escapeHtml(FS[p]||'(empty)')}</div>`;
+      w.querySelector('.wtitle span:last-child').textContent = '📄 ' + el.dataset.f;
+    });
+  };
+  render();
+}
+/* menu */
+const smenu = document.getElementById('smenu');
+function closeMenu(){ smenu.classList.remove('show'); }
+document.getElementById('menuBtn').onclick = e=>{ e.stopPropagation(); smenu.classList.toggle('show'); };
+document.addEventListener('click', e=>{ if(!smenu.contains(e.target)) closeMenu(); });
+document.querySelectorAll('[data-app]').forEach(el=> el.addEventListener('click', ()=> openApp(el.dataset.app)));
+/* clock */
+setInterval(()=>{ document.getElementById('clock').textContent = new Date().toLocaleString('en-IN',{weekday:'short',hour:'2-digit',minute:'2-digit'}); }, 1000);
+/* boot */
+const msgs = ['Loading kernel…','Mounting filesystem…','Applying security hardening…','Starting Cinnamon…'];
+let mi = 0;
+const bint = setInterval(()=>{
+  const p = Math.min(100, (mi+1) * 25);
+  document.getElementById('bbarFill').style.width = p + '%';
+  document.getElementById('bmsg').textContent = msgs[mi] || '';
+  mi++;
+  if(mi > msgs.length){ clearInterval(bint);
+    setTimeout(()=>{ document.getElementById('boot').classList.add('hide'); document.getElementById('login').classList.add('show'); }, 400);
+  }
+}, 650);
+document.getElementById('loginBtn').onclick = ()=>{
+  document.getElementById('login').classList.remove('show');
+  document.getElementById('desk').classList.add('show');
+  setTimeout(()=> openApp('term'), 500);
+};
+</script>
 </body>
 </html>
